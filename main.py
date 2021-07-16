@@ -51,7 +51,6 @@ def filter(letters="...", digits="...", region="."):
                 cursor.execute("SELECT * FROM numbers WHERE letters REGEXP ? AND digits REGEXP ? AND region REGEXP ?",
                                ('^' + letters, '^' + digits, '^' + region + '$'))
             results = cursor.fetchall()
-            print(results)
             return results
 
 
@@ -71,12 +70,15 @@ def add_number(letters, digits, region, cost):
 def delete_number(idx):
     with DataConn(db) as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM numbers WHERE idx=?", (idx, ))
-        conn.commit()
-    return True
+        cursor.execute("SELECT * FROM numbers WHERE idx=?", (idx,))
+        if cursor.fetchall():
+            cursor.execute("DELETE FROM numbers WHERE idx=?", (idx, ))
+            conn.commit()
+            return True
+        return False
 
 
 if __name__ == '__main__':
     with DataConn(db) as conn:
         cursor = conn.cursor()
-        filter("...", "...", ".")
+        print(filter("...", "...", "."))
